@@ -1,0 +1,64 @@
+""" détermine les couples de nombres amis (voir td3)
+mais cette fois avec des fonctions
+"""
+def somme_diviseurs(n : int) -> int:
+    """renvoie la somme des diviseurs propres de n"""
+    if n == 1:
+        somme = 0
+    else:
+        somme = 1
+        i = 2
+        while i * i <= n:
+            if n % i == 0:
+                somme = somme + i
+                if i * i != n:
+                    somme = somme + n // i
+            i = i + 1
+    return somme
+
+def test_somme_diviseurs() -> None:
+    """test de la fonction somme_diviseurs
+    il est toujours bon de tester quelques valeurs particulières
+    la fonction assert signalera une erreur si la condition n'est pas vérifiée
+    quand on développe, il est important d'avoir des tests automatisés.
+    Mais dans ce premier module, on va classiquement se contenter de demander les valeurs
+    à l'utilisateur."""
+    assert somme_diviseurs(1) == 0
+    assert somme_diviseurs(2) == 1
+    assert somme_diviseurs(3) == 1
+    assert somme_diviseurs(4) == 3
+    assert somme_diviseurs(5) == 1
+    assert somme_diviseurs(6) == 6
+    assert somme_diviseurs(220) == 284
+    assert somme_diviseurs(284) == 220
+    x = int(input("Entrez un entier pour tester la fonction somme_diviseurs : "))
+    print(f"somme_diviseurs({x}) = {somme_diviseurs(x)}")
+
+
+def sont_amis(a : int, b : int) -> bool:
+    """renvoie True si a et b sont amis, False sinon"""
+    return somme_diviseurs(a) == b and somme_diviseurs(b) == a
+
+def test_sont_amis() -> None:
+    """test de la fonction sont_amis"""
+    x = int(input("Entrez un entier a pour tester la fonction sont_amis : "))
+    y = int(input("Entrez un entier b pour tester la fonction sont_amis : "))
+    if sont_amis(x, y):
+        print(f"{x} et {y} sont amis")
+    else:
+        print(f"{x} et {y} ne sont pas amis")
+
+def afficher_couples_amis(max_n : int) -> None:
+    """affiche tous les couples de nombres amis inférieurs à max_n"""
+    print(f"Affichage des couples de nombres amis inférieurs à {max_n}")
+    for a in range(2, max_n):
+        b = somme_diviseurs(a)
+        if b <= a:  # pour ne pas avoir de couples en double
+            if sont_amis(a, b):
+                print(f"({a},{b}) sont amis")
+
+if __name__ == "__main__":
+    # test_somme_diviseurs()
+    # test_sont_amis()
+    afficher_couples_amis(10000)
+    

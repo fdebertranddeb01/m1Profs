@@ -1,33 +1,10 @@
 """ comparaison des temps de calcul des nombres amis suivant les 3 versions"""
 
-import time
-from multiprocessing import Process
+# la recherche des modules hors du répertoire courant semble une vrai galère en python
+# en désespoir de cause, j'ai copié le module beuvron.utils.temps_exec.py dans le répertoire courant 
+# pour pouvoir l'importer
 
-def temps_calcul(f,args,maxTimeInSeconds):
-    debut = time.perf_counter()
-    proc = Process(target=f, args=args)
-    proc.start()
-    proc.join(timeout=maxTimeInSeconds)
-    if proc.is_alive():
-        proc.terminate()
-        proc.join()
-        raise TimeoutError(f"le calcul a dépassé {maxTimeInSeconds} secondes")
-    fin = time.perf_counter()
-    return fin - debut
-
-def calcul_exponentiel(n : int) -> int:
-    resultat = 0
-    for i in range(2 ** n):
-        resultat += i
-    return resultat
-
-def test_temps_calcul(maxTimeInSeconds = 1):
-    for nmax in range(20, 30):
-        try :
-            duree = temps_calcul(calcul_exponentiel, (nmax,), maxTimeInSeconds)
-            print(f"temps de calcul de l'exponentiel pour n = {nmax} : {duree:.3f} secondes")
-        except TimeoutError as e:
-            print(f"calcul de l'exponentiel pour n = {nmax} a échoué : {e}")
+from temps_exec import temps_calcul
 
 # je remets les diverses versions de somme_div sous forme de fonctions pour pouvoir les tester avec le temps de calcul
 def somme_div_V1(n : int) -> int:
@@ -93,21 +70,21 @@ def amis_V3(nmax : int) -> int:
 
 def test_temps_amis_v3(nmax,maxTimeInSeconds = 1):
     try :
-        duree = temps_calcul(amis_V3, (nmax,), maxTimeInSeconds)
+        res,duree = temps_calcul(amis_V3, (nmax,), maxTimeInSeconds)
         print(f"temps de calcul des nombres amis V3 pour nmax = {nmax} : {duree:.3f} secondes")
     except TimeoutError as e:
         print(f"calcul des nombres amis V3 pour nmax = {nmax} a échoué : {e}")
 
 def test_temps_amis_v1(nmax,maxTimeInSeconds = 1):
     try :
-        duree = temps_calcul(amis_V1, (nmax,), maxTimeInSeconds)
+        res,duree = temps_calcul(amis_V1, (nmax,), maxTimeInSeconds)
         print(f"temps de calcul des nombres amis V1 pour nmax = {nmax} : {duree:.3f} secondes")
     except TimeoutError as e:
         print(f"calcul des nombres amis pour nmax = {nmax} a échoué : {e}")
 
 def test_temps_amis_v2(nmax,maxTimeInSeconds = 1):
     try :
-        duree = temps_calcul(amis_V2, (nmax,), maxTimeInSeconds)
+        res,duree = temps_calcul(amis_V2, (nmax,), maxTimeInSeconds)
         print(f"temps de calcul des nombres amis pour nmax = {nmax} : {duree:.3f} secondes")
     except TimeoutError as e:
         print(f"calcul des nombres amis pour nmax = {nmax} a échoué : {e}")
@@ -123,7 +100,7 @@ def affiche_tableau_temps_calcul(maxTimeInSeconds = 1):
         print(f"{amis_V3(nmax):7}", end=" : ")
         if v1ok:
             try :
-                duree_V1 = temps_calcul(amis_V1, (nmax,), maxTimeInSeconds)
+                res,duree_V1 = temps_calcul(amis_V1, (nmax,), maxTimeInSeconds)
                 print(f"{duree_V1:5.3f}", end=" ")
             except TimeoutError as e:
                 v1ok = False
@@ -132,7 +109,7 @@ def affiche_tableau_temps_calcul(maxTimeInSeconds = 1):
             print("--TO-", end=" ")
         if v2ok:
             try :
-                duree_V2 = temps_calcul(amis_V2, (nmax,), maxTimeInSeconds)
+                res,duree_V2 = temps_calcul(amis_V2, (nmax,), maxTimeInSeconds)
                 print(f"{duree_V2:5.3f}", end=" ")
             except TimeoutError as e:
                 v2ok = False
@@ -141,7 +118,7 @@ def affiche_tableau_temps_calcul(maxTimeInSeconds = 1):
             print("--TO-", end=" ")
         if v3ok:
             try :
-                duree_V3 = temps_calcul(amis_V3, (nmax,), maxTimeInSeconds)
+                res,duree_V3 = temps_calcul(amis_V3, (nmax,), maxTimeInSeconds)
                 print(f"{duree_V3:5.3f}", end=" ")
             except TimeoutError as e:
                 v3ok = False
@@ -159,12 +136,12 @@ if __name__ == "__main__":
     """ temps obtenu sur mon PC :
 temps de calcul des nombres amis pour divers nmax (timeout (TO) : 5 secondes)
 nmax : nbrAmis : --V1- --V2- --V3-
-  128:       2 : 0.092 0.048 0.052 
-  256:       2 : 0.302 0.061 0.045 
-  512:       4 : 2.013 0.130 0.050 
- 1024:       4 : --TO- 0.491 0.050 
- 2048:       5 : --TO- 2.518 0.047 
- 4096:       6 : --TO- --TO- 0.053 
- 8192:       9 : --TO- --TO- 0.074 
-16384:      11 : --TO- --TO- 0.109 
+  128:       2 : 0.050 0.007 0.000 
+  256:       2 : 0.535 0.032 0.000 
+  512:       4 : 2.560 0.114 0.000 
+ 1024:       4 : --TO- 0.497 0.001 
+ 2048:       5 : --TO- 2.699 0.003 
+ 4096:       6 : --TO- --TO- 0.009 
+ 8192:       9 : --TO- --TO- 0.026 
+16384:      11 : --TO- --TO- 0.063 
     """
