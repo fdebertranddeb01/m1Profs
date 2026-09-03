@@ -1,3 +1,3 @@
-f = float(input("Entrez la température en Fahrenheit : "))
-c = (f - 32) * 5/9
-print(f"La température en Celsius est : {c}")
+c = float(input("Entrez la température en Celsius : "))
+f = (c * 9/5) + 32
+print(f"La température en Fahrenheit est : {f}")
